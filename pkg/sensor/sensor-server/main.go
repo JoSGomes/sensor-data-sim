@@ -7,7 +7,7 @@ import (
 	"log"
 	"net"
 
-	sensor "github.com/sensor-data-sim/pkg/proto"
+	sensor "github.com/sensor-data-sim/proto"
 
 	"google.golang.org/grpc"
 )

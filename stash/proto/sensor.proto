@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package sensor;
+
+option go_package = "github.com/sensor-data-sim/proto";
+
+import "google/protobuf/timestamp.proto";
+
+// Serviço do sensor para enviar dados
+service SensorService {
+  // Envia dados do sensor para o servidor
+  rpc SendSensorData(SensorDataRequest) returns (SensorDataResponse);
+
+  // Stream contínuo de dados do sensor
+  rpc StreamSensorData(stream SensorDataRequest) returns (stream SensorDataResponse);
+}
+
+// Dados coletados pelo sensor
+message SensorData {
+  string sensor_id = 1;                           // ID único do sensor
+  google.protobuf.Timestamp timestamp = 2;       // Timestamp da coleta
+  Location location = 3;                          // Localização do sensor
+  double temperature_celsius = 4;                 // Temperatura em Celsius
+  double pressure_hpa = 5;                        // Pressão atmosférica em hPa
+  double humidity_percent = 6;                    // Umidade relativa em %
+  double noise_level_db = 7;                      // Nível de ruído em dB
+  double light_intensity_lux = 8;                 // Intensidade da luz em lux
+  double air_quality_index = 9;                   // Índice de qualidade do ar
+  double vibration_level = 10;                    // Nível de vibração
+  BatteryInfo battery = 11;                       // Informações da bateria
+  map<string, double> custom_metrics = 12;       // Métricas customizadas
+}
+
+// Localização do sensor
+message Location {
+  double latitude = 1;
+  double longitude = 2;
+  double altitude_meters = 3;
+  string description = 4;  // Descrição textual da localização
+}
+
+// Informações da bateria
+message BatteryInfo {
+  double voltage = 1;
+  double charge_percent = 2;
+  bool is_charging = 3;
+  double temperature_celsius = 4;
+}
+
+// Request para enviar dados do sensor
+message SensorDataRequest {
+  SensorData data = 1;
+}
+
+// Response do servidor
+message SensorDataResponse {
+  bool success = 1;
+  string message = 2;
+  google.protobuf.Timestamp server_timestamp = 3;
+}

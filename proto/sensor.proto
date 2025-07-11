@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+option go_package = "github.com/sensor-data-sim/pkg/proto/sensor";
+
+package sensor;
+
+import "google/protobuf/timestamp.proto";
+
+service Greeter {
+// Sends data from sensor to server
+rpc SendSensorData (SensorDataRequest) returns (SensorDataResponse);
+
+// Continuously streams sensor data to the server
+rpc StreamSensorData(stream SensorDataRequest) returns (stream SensorDataResponse);
+}
+
+message SensorDataRequest {
+  SensorData data = 1;
+}
+
+message SensorDataResponse {
+  bool success = 1;
+  string message = 2;
+  google.protobuf.Timestamp server_timestamp = 3;
+}
+
+message SensorData {
+  string sensor_id = 1;                           // Unique ID of the sensor
+  google.protobuf.Timestamp timestamp = 2;        // // Collection timestamp
+  Location location = 3;                          // Sensor location
+  double temperature_celsius = 4;                 // Celsius temperature
+  double pressure_hpa = 5;                        // Atmospheric Pression in hPa
+  double humidity_percent = 6;                    // Relative humidity in %
+  double noise_level_db = 7;                      // Noise level in dB
+  double light_intensity_lux = 8;                 // Light intensity em lux
+  double air_quality_index = 9;                   // Quality index of the air
+  double vibration_level = 10;                    // Vibration level
+  BatteryInfo battery = 11;                       // Battery information
+  map<string, double> custom_metrics = 12;        // Customized metrics what can define by user
+}
+
+message Location {
+  double latitude = 1;
+  double longitude = 2;
+  double altitude_meters = 3;
+  string description = 4;
+}
+
+message BatteryInfo {
+  double voltage = 1;
+  double charge_percent = 2;
+  bool is_charging = 3;
+  double temperature_celsius = 4;
+}

@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sensor-simulator
+  labels:
+    app: sensor-simulator
+spec:
+  replicas: 3  # Número de sensores simulados
+  selector:
+    matchLabels:
+      app: sensor-simulator
+  template:
+    metadata:
+      labels:
+        app: sensor-simulator
+    spec:
+      containers:
+      - name: sensor-sim
+        image: sensor-data-sim:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: SERVER_ADDR
+          value: "sensor-server:50051"  # Endereço do servidor gRPC
+        - name: SEND_INTERVAL
+          value: "10s"  # Intervalo de envio dos dados
+        - name: SENSOR_LAT
+          value: "-23.5505"  # Latitude (São Paulo)
+        - name: SENSOR_LNG
+          value: "-46.6333"  # Longitude (São Paulo)
+        - name: SENSOR_ALT
+          value: "760"       # Altitude em metros
+        - name: SENSOR_LOCATION
+          value: "São Paulo, Brasil"
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+---
+# ConfigMap para configurações compartilhadas
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sensor-config
+data:
+  server_addr: "sensor-server:50051"
+  send_interval: "10s"
+  log_level: "info"
+---
+# Service para expor o servidor (caso necessário)
+apiVersion: v1
+kind: Service
+metadata:
+  name: sensor-server
+spec:
+  selector:
+    app: sensor-server
+  ports:
+  - port: 50051
+    targetPort: 50051
+    protocol: TCP
+  type: ClusterIP
+
