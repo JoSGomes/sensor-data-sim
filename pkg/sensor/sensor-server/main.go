@@ -36,7 +36,7 @@ func main() {
 	}
 }
 
-func (s *server) SayHello(_ context.Context, input *sensor.HelloRequest) (*sensor.HelloReply, error) {
-	log.Printf("Received: %v", input.GetName())
-	return &sensor.HelloReply{Message: "Hello Sensor Client!\n I received: " + input.GetName()}, nil
+func (s *server) SendSensorData(_ context.Context, input *sensor.SensorDataRequest) (*sensor.SensorDataResponse, error) {
+	log.Printf("Received: %v", input.GetData())
+	return &sensor.SensorDataResponse{Message: fmt.Sprintf("Hello Sensor Client!\n I received: %+v", input.GetData())}, nil
 }

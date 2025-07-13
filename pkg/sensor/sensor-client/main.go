@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sensor-data-sim/environment"
@@ -24,7 +25,7 @@ func main() {
 
 	client, err := grpc.NewClient(*addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatal("An error occurred while creating the client:", err)
+		log.Fatal("An error occurred while creating the client", err)
 	}
 	defer client.Close()
 
@@ -44,14 +45,24 @@ func main() {
 		Description:    sensorConf.Sensor.Location.Description,
 	}
 
-	SensorSimulatorService := service.NewSensorSimulator(fmt.Sprintf("Sensor - %s", location.Description), location)
+	sensorSim := service.NewSensorSimulator(fmt.Sprintf("Sensor - %s", location.Description), location)
+	sensorSim.StartGeneratingReadings(ctx, time.Duration(sensorConf.Sensor.Interval)*time.Second)
 
 	sensorGreeterClient := sensor.NewGreeterClient(client)
 
-	//res, err := sensorGreeterClient.SayHello(ctx, req)
-	//if err != nil {
-	//	log.Fatal("An error occurred while calling the SayHello method:", err)
-	//}
-	//
-	//log.Printf("Received response: %s", res.GetMessage())
+	for {
+		time.Sleep(5 * time.Second)
+		req := sensorSim.GetSensorData()
+		res, err := sensorGreeterClient.SendSensorData(ctx, req)
+		if err != nil {
+			log.Fatal("An error occurred while calling the SendSensorData method", err)
+		}
+		if !res.GetSuccess() {
+			log.Printf("Failed to send sensor data: %v", res.GetMessage())
+			continue
+		}
+
+		log.Printf("Success response from server: %v", res.GetMessage())
+	}
+
 }
