@@ -10,7 +10,7 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sensor-data-sim/environment"
 	"github.com/sensor-data-sim/pkg/service"
-	"github.com/sensor-data-sim/proto"
+	sensor "github.com/sensor-data-sim/proto"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -57,12 +57,13 @@ func main() {
 		if err != nil {
 			log.Fatal("An error occurred while calling the SendSensorData method", err)
 		}
+
 		if !res.GetSuccess() {
 			log.Printf("Failed to send sensor data: %v", res.GetMessage())
-			continue
+		} else {
+			log.Printf("Success response from server: %v", res.GetMessage())
 		}
 
-		log.Printf("Success response from server: %v", res.GetMessage())
 	}
 
 }

@@ -37,6 +37,10 @@ func main() {
 }
 
 func (s *server) SendSensorData(_ context.Context, input *sensor.SensorDataRequest) (*sensor.SensorDataResponse, error) {
-	log.Printf("Received: %v", input.GetData())
-	return &sensor.SensorDataResponse{Message: fmt.Sprintf("Hello Sensor Client!\n I received: %+v", input.GetData())}, nil
+	log.Printf("Received: %s", input.GetData().SensorId)
+	response := &sensor.SensorDataResponse{
+		Message: fmt.Sprintf("Hello %s, I received your message!", input.GetData().SensorId),
+		Success: true,
+	}
+	return response, nil
 }
